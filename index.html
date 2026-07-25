@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PCT 423/521 — Stability, Packaging & Physical Pharmacy (Theory)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,340;0,9..144,480;0,9..144,560;0,9..144,650;1,9..144,480&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-0:#050912;
+    --bg-1:#0A1230;
+    --bg-2:#101B45;
+    --bg-3:#16225A;
+    --paper:#F6F1E7;
+    --paper-dim:#EAE2CE;
+    --ink:#0B1220;
+    --ink-soft:#57647A;
+    --gold:#E3B24D;
+    --gold-dim:#B98A2E;
+    --cyan:#3FD1D9;
+    --cyan-dim:#1D8A91;
+    --coral:#FF6B52;
+    --green:#4FD189;
+    --violet:#9B87F5;
+    --text-0:#F4F1EA;
+    --text-1:#AFC0DA;
+    --text-2:#728098;
+    --line:rgba(244,241,234,0.12);
+    --accent:var(--cyan);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:
+      radial-gradient(ellipse 1100px 760px at 12% -8%, rgba(63,209,217,0.13), transparent 58%),
+      radial-gradient(ellipse 900px 700px at 108% 6%, rgba(227,178,77,0.10), transparent 55%),
+      radial-gradient(ellipse 1300px 900px at 50% 115%, rgba(22,34,90,0.65), transparent 60%),
+      linear-gradient(180deg, var(--bg-0) 0%, var(--bg-1) 42%, var(--bg-1) 100%);
+    color:var(--text-0);
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+  ::selection{background:var(--cyan); color:var(--bg-0);}
+  h1,h2,h3,.serif{font-family:'Fraunces',serif;}
+  .mono{font-family:'JetBrains Mono',monospace;}
+  button{font-family:'Inter',sans-serif; cursor:pointer; border:none; background:none; color:inherit;}
+  button:focus-visible, input:focus-visible, a:focus-visible, [tabindex]:focus-visible{outline:2px solid var(--cyan); outline-offset:3px; border-radius:4px;}
+  a{color:inherit;}
+  svg{display:block;}
+
+  .bg-curve{position:fixed; inset:0; z-index:0; pointer-events:none;}
+  .bg-grid{
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    background-image:
+      linear-gradient(rgba(244,241,234,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(244,241,234,0.03) 1px, transparent 1px);
+    background-size:46px 46px;
+    mask-image:radial-gradient(ellipse 900px 700px at 50% 0%, #000 0%, transparent 70%);
+  }
+  #curveDraw{
+    stroke-dasharray:2200;
+    stroke-dashoffset:2200;
+    animation:drawPath 2.6s cubic-bezier(.22,.61,.36,1) .2s forwards;
+  }
+  #curveDrawFaint{
+    stroke-dasharray:2200;
+    stroke-dashoffset:2200;
+    animation:drawPath 3.1s cubic-bezier(.22,.61,.36,1) .5s forwards;
+  }
+  @keyframes drawPath{ to{ stroke-dashoffset:0; } }
+
+  .app{position:relative; z-index:1; min-height:100vh; display:flex; flex-direction:column; align-items:center; padding:32px 20px 64px;}
+  .wrap{width:100%; max-width:780px;}
+
+  .topbar{
+    display:flex; justify-content:space-between; align-items:center;
+    width:100%; max-width:780px; margin-bottom:30px;
+    animation:fadeSlideUp .6s cubic-bezier(.22,.61,.36,1) both;
+  }
+  .brand{display:flex; align-items:center; gap:10px;}
+  .brand-mono{
+    font-family:'JetBrains Mono',monospace; font-size:0.66rem; letter-spacing:0.16em; color:var(--text-2);
+    padding:5px 9px; border:1px solid var(--line); border-radius:6px;
+  }
+  .brand-word{font-family:'Fraunces',serif; font-weight:560; font-style:italic; font-size:1.3rem; letter-spacing:-0.01em;}
+  .brand-word .dot{color:var(--gold);}
+  .user-chip{
+    display:flex; align-items:center; gap:8px;
+    font-size:0.8rem; color:var(--text-1);
+    background:rgba(244,241,234,0.05); border:1px solid var(--line);
+    backdrop-filter:blur(10px);
+    padding:7px 14px 7px 10px; border-radius:100px;
+  }
+  .user-chip .dot-ico{width:7px; height:7px; border-radius:50%; background:var(--cyan); box-shadow:0 0 8px 1px var(--cyan);}
+  .user-chip strong{color:var(--text-0); font-weight:600;}
+
+  .gate{
+    display:flex; flex-direction:column; align-items:center; text-align:center;
+    min-height:82vh; justify-content:center; width:100%; max-width:560px; margin:0 auto;
+  }
+  .gate-eyebrow{
+    font-family:'JetBrains Mono',monospace; font-size:0.7rem; letter-spacing:0.22em; text-transform:uppercase; color:var(--cyan);
+    margin-bottom:20px; opacity:0; animation:fadeSlideUp .7s cubic-bezier(.22,.61,.36,1) .1s both;
+  }
+  .gate h1{
+    font-size:clamp(2.2rem,6vw,3rem); font-weight:560; line-height:1.06; letter-spacing:-0.02em;
+    margin-bottom:16px; opacity:0; animation:fadeSlideUp .7s cubic-bezier(.22,.61,.36,1) .22s both;
+  }
+  .gate h1 em{font-style:italic; color:var(--gold);}
+  .gate p.lead{
+    color:var(--text-1); font-size:1.02rem; line-height:1.65; max-width:440px; margin-bottom:38px;
+    opacity:0; animation:fadeSlideUp .7s cubic-bezier(.22,.61,.36,1) .34s both;
+  }
+  .name-form{width:100%; max-width:380px; display:flex; flex-direction:column; gap:14px;
+    opacity:0; animation:fadeSlideUp .7s cubic-bezier(.22,.61,.36,1) .46s both;}
+  .name-form input{
+    width:100%; padding:17px 18px; border-radius:12px;
+    background:rgba(244,241,234,0.06); border:1.5px solid var(--line);
+    color:var(--text-0); font-size:1.05rem; font-family:'Fraunces',serif;
+    transition:border-color .2s, background .2s, box-shadow .2s;
+  }
+  .name-form input::placeholder{color:rgba(244,241,234,0.32); font-family:'Inter',sans-serif; font-size:0.95rem;}
+  .name-form input:focus{border-color:var(--cyan); background:rgba(244,241,234,0.09); box-shadow:0 0 0 4px rgba(63,209,217,0.12);}
+
+  .btn{
+    padding:16px 24px; border-radius:12px; font-weight:600; font-size:0.95rem;
+    transition:transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .2s ease, opacity .15s ease, background .2s;
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  }
+  .btn:hover{transform:translateY(-2px);}
+  .btn:active{transform:translateY(0) scale(.98);}
+  .btn-primary{background:linear-gradient(135deg, var(--cyan), var(--cyan-dim)); color:var(--bg-0);}
+  .btn-primary:hover{box-shadow:0 10px 30px -8px rgba(63,209,217,0.55);}
+  .btn-primary:disabled{opacity:0.3; transform:none; box-shadow:none; cursor:not-allowed;}
+  .btn-gold{background:linear-gradient(135deg, var(--gold), var(--gold-dim)); color:var(--bg-0);}
+  .btn-gold:hover{box-shadow:0 10px 30px -8px rgba(227,178,77,0.55);}
+  .btn-gold:disabled{opacity:0.28; transform:none; box-shadow:none; cursor:not-allowed;}
+  .btn-ghost{background:rgba(244,241,234,0.04); color:var(--text-0); border:1.5px solid var(--line);}
+  .btn-ghost:hover{background:rgba(244,241,234,0.09); border-color:rgba(244,241,234,0.28);}
+  .btn-ghost:disabled{opacity:0.25; transform:none; cursor:not-allowed;}
+  .btn-sm{padding:10px 17px; font-size:0.83rem; border-radius:9px;}
+
+  .gate-hint{font-size:0.76rem; color:var(--text-2); margin-top:16px;
+    opacity:0; animation:fadeSlideUp .7s cubic-bezier(.22,.61,.36,1) .56s both;}
+
+  @keyframes fadeSlideUp{ from{opacity:0; transform:translateY(16px);} to{opacity:1; transform:translateY(0);} }
+
+  .home-head{margin-bottom:30px; animation:fadeSlideUp .6s cubic-bezier(.22,.61,.36,1) .05s both;}
+  .home-head .eyebrow{font-family:'JetBrains Mono',monospace; font-size:0.7rem; letter-spacing:0.16em; text-transform:uppercase; color:var(--cyan); margin-bottom:10px;}
+  .home-head h1{font-size:1.95rem; font-weight:560; letter-spacing:-0.015em; margin-bottom:9px;}
+  .home-head p{color:var(--text-1); font-size:0.96rem; line-height:1.55; max-width:560px;}
+
+  .overall-bar{
+    width:100%; height:7px; border-radius:100px; background:rgba(244,241,234,0.08);
+    margin:24px 0 6px; overflow:hidden;
+  }
+  .overall-bar-fill{height:100%; background:linear-gradient(90deg, var(--cyan), var(--gold)); border-radius:100px; transition:width .6s cubic-bezier(.22,.61,.36,1); box-shadow:0 0 12px 0 rgba(63,209,217,0.5);}
+  .overall-label{font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--text-2); margin-bottom:28px; letter-spacing:0.02em;}
+
+  .topic-list{display:flex; flex-direction:column; gap:16px;}
+  .topic-card{
+    background:var(--paper); color:var(--ink); border-radius:16px; padding:24px 26px;
+    position:relative; overflow:hidden; opacity:0;
+    animation:fadeSlideUp .55s cubic-bezier(.22,.61,.36,1) forwards;
+    box-shadow:0 18px 40px -22px rgba(0,0,0,0.55);
+    transition:transform .25s cubic-bezier(.22,.61,.36,1), box-shadow .25s ease;
+  }
+  .topic-card:hover{transform:translateY(-3px); box-shadow:0 24px 50px -20px rgba(0,0,0,0.6);}
+  .topic-card::before{
+    content:''; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--tcolor, var(--cyan));
+  }
+  .topic-top{display:flex; justify-content:space-between; align-items:flex-start; gap:16px; margin-bottom:16px;}
+  .topic-num{
+    font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:var(--tcolor,var(--ink-soft)); letter-spacing:0.06em; font-weight:600;
+  }
+  .topic-title{font-family:'Fraunces',serif; font-weight:600; font-size:1.26rem; letter-spacing:-0.01em; margin-top:3px;}
+  .topic-desc{font-size:0.84rem; color:#5b6670; line-height:1.5; margin-top:7px; max-width:480px;}
+
+  .mode-row{display:flex; gap:10px; flex-wrap:wrap; margin-top:18px;}
+  .mode-btn{
+    flex:1; min-width:160px; text-align:left; padding:14px 15px; border-radius:11px;
+    background:rgba(11,18,32,0.035); border:1.5px solid rgba(11,18,32,0.09);
+    display:flex; flex-direction:column; gap:7px; transition:background .18s, border-color .18s, transform .18s;
+  }
+  .mode-btn:hover{background:rgba(11,18,32,0.075); border-color:rgba(11,18,32,0.22); transform:translateY(-1px);}
+  .mode-btn .mtop{display:flex; align-items:center; justify-content:space-between; gap:8px;}
+  .mode-btn .mlabel{font-size:0.82rem; font-weight:600; display:flex; align-items:center; gap:7px;}
+  .mode-btn .mprog{font-size:0.7rem; color:#5b6670; font-family:'JetBrains Mono',monospace;}
+  .mode-badge{
+    font-size:0.63rem; padding:3px 8px; border-radius:100px; font-weight:700; letter-spacing:0.03em;
+  }
+  .badge-done{background:var(--green); color:#0B1220;}
+  .badge-progress{background:var(--gold); color:#0B1220;}
+  .badge-new{background:rgba(11,18,32,0.08); color:#5b6670;}
+
+  .back-row{margin-bottom:20px; animation:fadeSlideUp .5s cubic-bezier(.22,.61,.36,1) both;}
+  .quiz-topbar{display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; width:100%;
+    animation:fadeSlideUp .5s cubic-bezier(.22,.61,.36,1) .05s both;}
+  .quiz-meta{font-family:'JetBrains Mono',monospace; font-size:0.7rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--accent);}
+  .quiz-counter{font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--text-2);}
+
+  .dot-row{display:flex; gap:5px; width:100%; margin-bottom:28px;
+    animation:fadeSlideUp .5s cubic-bezier(.22,.61,.36,1) .1s both;}
+  .pip{flex:1; height:5px; border-radius:100px; background:rgba(244,241,234,0.1); transition:background .3s ease, box-shadow .3s ease;}
+  .pip.filled{background:var(--accent);}
+  .pip.current{background:var(--text-0); box-shadow:0 0 10px 1px rgba(244,241,234,0.5);}
+
+  .qcard-outer{perspective:2200px;}
+  .qcard{
+    background:var(--paper); color:var(--ink); border-radius:20px; padding:38px 34px;
+    min-height:300px; display:flex; flex-direction:column; position:relative;
+    box-shadow:0 24px 60px -22px rgba(0,0,0,0.6);
+    transition:transform .32s cubic-bezier(.22,.61,.36,1), opacity .32s cubic-bezier(.22,.61,.36,1);
+  }
+  .qcard::before{
+    content:''; position:absolute; left:26px; right:26px; top:0; height:3px; border-radius:0 0 4px 4px;
+    background:var(--accent); opacity:.75;
+  }
+  .card-exit-left{transform:translateX(-36px) scale(.97); opacity:0;}
+  .card-exit-right{transform:translateX(36px) scale(.97); opacity:0;}
+  .card-enter-right{transform:translateX(36px) scale(.97); opacity:0; transition:none !important;}
+  .card-enter-left{transform:translateX(-36px) scale(.97); opacity:0; transition:none !important;}
+
+  .qkicker{font-family:'JetBrains Mono',monospace; font-size:0.68rem; text-transform:uppercase; letter-spacing:0.14em; color:var(--cyan-dim); font-weight:600; margin-bottom:16px;}
+  .qtext{font-family:'Fraunces',serif; font-size:1.4rem; line-height:1.42; font-weight:500; flex:1;}
+
+  .flip-scene{perspective:1800px; margin-top:4px; flex:1; display:flex; cursor:pointer; min-height:190px;}
+  .flip-card{
+    width:100%; position:relative; transform-style:preserve-3d;
+    transition:transform .6s cubic-bezier(.34,1.15,.34,1); min-height:190px;
+  }
+  .flip-card.flipped{transform:rotateY(180deg);}
+  .flip-face{
+    position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden;
+    display:flex; flex-direction:column; justify-content:center;
+  }
+  .flip-face.back{transform:rotateY(180deg);}
+  .flip-answer-text{font-family:'Fraunces',serif; font-size:1.12rem; line-height:1.62; color:#2b3745; font-weight:400;}
+  .flip-hint{
+    position:absolute; bottom:0; right:2px; color:var(--ink-soft); opacity:0.32;
+    animation:floatPulse 2.6s ease-in-out infinite;
+  }
+  @keyframes floatPulse{ 0%,100%{opacity:0.22; transform:translateY(0) rotate(0deg);} 50%{opacity:0.5; transform:translateY(-2px) rotate(24deg);} }
+  .flip-scene:active .flip-card:not(.flipped){transform:scale(.985);}
+
+  .quiz-nav{display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:24px;
+    animation:fadeSlideUp .5s cubic-bezier(.22,.61,.36,1) .15s both;}
+  .nav-btn{
+    display:flex; align-items:center; gap:8px; padding:14px 22px; border-radius:12px; font-weight:600; font-size:0.9rem;
+    transition:transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .2s ease, opacity .15s ease, background .2s;
+  }
+  .nav-btn:hover:not(:disabled){transform:translateY(-2px);}
+  .nav-btn:active:not(:disabled){transform:translateY(0) scale(.98);}
+  .nav-btn:disabled{opacity:0.25; cursor:not-allowed; transform:none;}
+  .nav-prev{background:rgba(244,241,234,0.05); border:1.5px solid var(--line); color:var(--text-0);}
+  .nav-prev:hover:not(:disabled){background:rgba(244,241,234,0.1);}
+  .nav-next{background:linear-gradient(135deg, var(--gold), var(--gold-dim)); color:var(--bg-0);}
+  .nav-next:hover:not(:disabled){box-shadow:0 10px 26px -8px rgba(227,178,77,0.5);}
+
+  .results-card{background:var(--paper); color:var(--ink); border-radius:20px; padding:48px 34px; text-align:center;
+    box-shadow:0 24px 60px -22px rgba(0,0,0,0.6); animation:fadeSlideUp .5s cubic-bezier(.22,.61,.36,1) both;}
+  .results-eyebrow{font-family:'JetBrains Mono',monospace; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.14em; color:var(--cyan-dim); margin-bottom:22px;}
+  .score-ring-wrap{
+    width:172px; height:172px; border-radius:50%; margin:0 auto 22px; position:relative;
+    display:flex; align-items:center; justify-content:center;
+    background:conic-gradient(var(--gold-dim) 0%, rgba(11,18,32,0.08) 0);
+  }
+  .score-ring-inner{
+    width:140px; height:140px; border-radius:50%; background:var(--paper);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    box-shadow:0 2px 10px rgba(0,0,0,0.08) inset;
+  }
+  .score-pct{font-family:'Fraunces',serif; font-size:2.4rem; font-weight:600;}
+  .score-pct-label{font-family:'JetBrains Mono',monospace; font-size:0.6rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--ink-soft); margin-top:2px;}
+  .results-verdict{font-family:'Fraunces',serif; font-size:1.15rem; font-weight:560; margin-bottom:6px;}
+  .results-sub{color:#5b6670; font-size:0.9rem; margin-bottom:30px;}
+  .results-actions{display:flex; gap:10px; justify-content:center; flex-wrap:wrap;}
+
+  @media (max-width:600px){
+    .gate h1{font-size:2.05rem;}
+    .qcard{padding:28px 22px;}
+    .topic-card{padding:19px;}
+    .mode-row{flex-direction:column;}
+    .nav-btn{padding:13px 16px; flex:1;}
+    .nav-btn span.nb-label{display:inline;}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important;}
+  }
+</style>
+</head>
+<body>
+
+<svg class="bg-curve" viewBox="0 0 1440 900" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+  <path id="curveDraw" d="M -50 130 C 260 150, 390 500, 750 630 S 1250 790, 1550 810" stroke="#3FD1D9" stroke-width="1.4" fill="none" opacity="0.4"/>
+  <path id="curveDrawFaint" d="M -50 70 C 310 100, 510 300, 770 420 S 1200 560, 1550 610" stroke="#E3B24D" stroke-width="1" fill="none" opacity="0.28"/>
+  <circle r="4.2" fill="#3FD1D9" opacity="0.85">
+    <animateMotion dur="9s" begin="2.4s" repeatCount="indefinite" path="M -50 130 C 260 150, 390 500, 750 630 S 1250 790, 1550 810"/>
+  </circle>
+  <circle r="9" fill="#3FD1D9" opacity="0.18">
+    <animateMotion dur="9s" begin="2.4s" repeatCount="indefinite" path="M -50 130 C 260 150, 390 500, 750 630 S 1250 790, 1550 810"/>
+  </circle>
+</svg>
+<div class="bg-grid"></div>
+
+<div class="app" id="app"></div>
+
+<script>
+/* ============================================================
+   DATA — PCT 423/521: Stability, Packaging & Physical Pharmacy
+   STANDARD THEORY & APPLICATION QUESTIONS — FULLY COMPREHENSIVE
+   ============================================================ */
+const SECTIONS = [
+  // ========= SECTION 1: POLYMORPHISM & MODIFIED RELEASE =========
+  {
+    id:'modification',
+    color:'#3FD1D9',
+    num:'01',
+    title:'Polymorphism, Bioavailability & Modified Release',
+    desc:'Polymorphism and bioavailability (chloramphenicol palmitate, ritonavir), modified release systems (delayed, extended, enteric coat, osmotic pump), rationale for controlled release, hydrophilic matrix, membrane reservoir, pulsatile release.',
+    short:[
+      {q:"Compare the bioavailability of the α-polymorph and β-polymorph of chloramphenicol palmitate. Which polymorph produces higher serum levels and why?", a:"The β-polymorph produces higher serum levels than the α-polymorph. This is because the β-polymorph is metastable and has higher solubility and dissolution rate compared to the stable α-polymorph, which has lower solubility and results in poor bioavailability."},
+      {q:"Why is polymorphism rarely an issue for water-soluble drugs but critical for poorly soluble ones?", a:"Water-soluble drugs dissolve readily regardless of crystal form, so polymorphic differences have minimal impact on dissolution and bioavailability. For poorly soluble drugs (BCS Class II/IV), dissolution is the rate-limiting step for absorption, so differences in solubility between polymorphs can significantly affect bioavailability."},
+      {q:"What was the Ritonavir crisis and what lesson does it teach about polymorphism?", a:"Ritonavir, an HIV protease inhibitor, was originally formulated using Form I polymorph. After several years on the market, a more stable but less soluble Form II polymorph appeared spontaneously. This new polymorph had significantly lower bioavailability, causing product failure and withdrawal. The lesson is that metastable polymorphs used to enhance bioavailability must be 'stable enough' to survive the product's shelf life without converting to a less soluble form."},
+      {q:"Define modified-release drug delivery systems and list the three main types.", a:"Modified-release systems are dosage forms designed to deliver drugs at specific rates, times, or to particular physiological sites. The three main types are: (1) Delayed release — release at a time later than immediately after administration (e.g., enteric-coated tablets); (2) Extended release — allows reduction in dosing frequency compared to immediate-release (sustained-, controlled-, prolonged-release); (3) Pulsatile release — drug released in programmed pulses after a lag period for chronotherapy."},
+      {q:"What is the rationale for developing controlled-release formulations? Discuss the benefits.", a:"The rationale is to maintain plasma concentration within the therapeutic window, avoiding toxic peaks and sub-therapeutic troughs. Benefits include: reduced dosing frequency → improved patient compliance; minimized side effects by avoiding high peak concentrations; targeted drug delivery to specific GI sites; and improved bioavailability of short half-life drugs."},
+      {q:"Describe the mechanism of drug release from a hydrophilic matrix tablet. Give an example.", a:"Water penetrates the HPMC matrix, causing it to swell and form a gel layer. Drug diffuses out through this gel layer at a controlled rate, typically following first-order kinetics. Example: Metformin SR, Morphine MST Continus."},
+      {q:"Explain how an osmotic pump (OROS) system works. What order of kinetics does it follow?", a:"The OROS system consists of a drug core coated with a semipermeable membrane with a laser-drilled hole. Water enters by osmosis, creating pressure that pushes drug out through the hole at a constant rate. It follows zero-order kinetics and is independent of GI pH. Examples: Nifedipine GITS, Oxybutynin OROS."},
+      {q:"What is enteric coating and what polymers are used? Give clinical examples.", a:"Enteric coating is a polymer coating that remains intact at gastric pH (1–3) but dissolves rapidly at intestinal pH (>5.5–6). Common polymers include cellulose acetate phthalate, HPMC phthalate, and Eudragit L/S. Uses: protect acid-labile drugs (omeprazole, erythromycin); reduce GI irritation (aspirin EC, diclofenac EC); colonic targeting (mesalazine for ulcerative colitis)."},
+      {q:"What is pulsatile release and what conditions benefit from it? Give an example.", a:"Pulsatile release delivers drug in programmed pulses after a lag period, making it ideal for chronotherapy (matching drug release to circadian rhythms). Conditions that benefit: morning surge in blood pressure/angina, nocturnal asthma, rheumatoid arthritis (morning stiffness). Example: Verapamil (Covera HS) — taken at bedtime, drug released at 3–5 am when cardiovascular risk is highest."},
+      {q:"In the theoretical plasma profile comparison, what are the advantages of extended-release over immediate-release formulations?", a:"The extended-release profile (dotted line) represents one dose of a sustained-release dosage form over the same period as three doses of immediate-release. It reduces Cmax (avoiding levels above maximum safe concentration), extends the time that an effective concentration is maintained, and minimizes fluctuations between peak and trough levels."},
+      {q:"What is the difference between delayed release and extended release?", a:"Delayed release releases the drug at a time later than immediately after administration (e.g., enteric coatings that release at intestinal pH). Extended release allows a reduction in dosing frequency compared to immediate release and maintains drug levels over a prolonged period (sustained-, controlled-, prolonged-release)."},
+      {q:"Explain the membrane reservoir (coated) system for modified release. Give an example.", a:"The drug core is coated with a rate-controlling membrane (e.g., ethylcellulose, Eudragit RS). Drug diffuses through the membrane at a controlled rate, which can follow zero or first-order kinetics depending on the system. Example: Diltiazem SR, Theophylline SR."},
+    ]
+  },
+  // ========= SECTION 2: PHARMACEUTICAL PACKAGING =========
+  {
+    id:'packaging',
+    color:'#E3B24D',
+    num:'02',
+    title:'Pharmaceutical Packaging',
+    desc:'Definition, primary functions, types of packaging (primary, secondary, tertiary), glass properties/advantages/disadvantages, plastic/rubber/metal packaging, package testing, interactions (sorption, absorption, leaching, permeation), and ideal packaging material properties.',
+    short:[
+      {q:"Define pharmaceutical packaging and state its primary functions.", a:"Pharmaceutical packaging is the science and technology of enclosing or protecting medicines/pharmaceutical products for distribution, storage, and therapeutic use. Primary functions include: product identification, product promotion, product use, product protection from environmental factors (oxygen, moisture, light), and product instructions/storage specifications."},
+      {q:"Distinguish between primary, secondary, and tertiary packaging with examples.", a:"Primary packaging is the material that first encloses the product and has direct contact (e.g., blister packs, bottles, plastic containers). Secondary packaging is intermediate packaging used to group primary packaging (e.g., cardboard boxes). Tertiary packaging is used for bulk handling and shipping (e.g., barrels, containers, cartons)."},
+      {q:"Describe the properties of glass as a pharmaceutical packaging material.", a:"Glass is amorphous, hard, brittle, transparent or translucent, has no definite melting point, is a good electrical insulator, and is unaffected by air, water, or chemical reagents except hydrofluoric acid. It has high compressive strength and can absorb, transmit, and reflect light."},
+      {q:"What are the advantages of glass as a packaging material?", a:"Advantages include: inertness to most drug products; imparts no odour or taste; impervious to air and moisture; no change in ageing; FDA approved; allows easy inspection of contents; can be coloured to protect from harmful light wavelengths; easy to clean and sterilize by heat; available in various sizes and shapes; and recyclable."},
+      {q:"What are the disadvantages of glass as a packaging material?", a:"Disadvantages include: fragile (produces fragments and cracks); may crack with sudden temperature changes; expensive compared to plastic; high transportation cost due to weight; less pressure safety and impact resistance; requires special care during transportation; and certain types release alkali into contents."},
+      {q:"Define absorption, adsorption, leaching, and permeation in the context of pharmaceutical packaging interactions.", a:"Absorption — process by which one substance takes up another substance (e.g., drug absorbed into plastic). Adsorption — process by which molecules adhere to the surface of another substance (e.g., drug adsorbed onto glass surface). Leaching — migration of a substance from packaging material to the pharmaceutical product (e.g., rubber reacts with zinc salts). Permeation — entry or exit of a medicinal substance through packaging materials (e.g., water vapor through rubber closures)."},
+      {q:"Give examples of packaging-drug interactions and their consequences.", a:"Glass reacts with proteins and globulins; Polyvinylchloride (PVC) reacts with warfarin, vitamin A, and benzodiazepines; Rubber reacts with zinc salts (leaching); Borosilicate reacts with barium ions; Diethylhexylphthalate (DEHP) reacts with calcium ions; Heavy metals react with bacitracin; Aluminium reacts with cisplatin."},
+      {q:"What factors influence the choice of a pharmaceutical packaging material?", a:"The degree of protection required by the material (against light, moisture, oxygen, biological contamination, mechanical damage); compatibility with the pharmaceutical product (to avoid interactions); route of administration; physical form of the product; and cost."},
+      {q:"List the properties of an ideal packaging material.", a:"It must protect the drug from environmental conditions; must not react with the product; must not be toxic; must meet tamper resistance requirements; must not cause product degradation."},
+      {q:"What package tests are performed to ensure packaging integrity?", a:"Drop test, revolving drum test, inclined impact test, shock test, and vibration test."},
+    ]
+  },
+  // ========= SECTION 3: PHYSICAL PROPERTIES =========
+  {
+    id:'physical-properties',
+    color:'#4FD189',
+    num:'03',
+    title:'Physical Properties of Drugs & Additives',
+    desc:'Solid state (crystalline, amorphous, polymorphism), particle size and Noyes-Whitney equation, bulk density and compressibility (Carr Index, Hausner Ratio), flowability (angle of repose), wettability (contact angle, Young equation), and BCS classification.',
+    short:[
+      {q:"Distinguish between crystalline and amorphous solid states. What are the implications for drug formulation?", a:"Crystalline solids have an ordered, repeating lattice structure, a sharp melting point, lower energy (thermodynamically stable), and generally lower solubility. They are preferred for long-term storage. Amorphous solids have no long-range molecular order, higher free energy (less stable), higher apparent solubility and dissolution rate, but risk recrystallisation over time. Amorphous forms are used for BCS Class II/IV drugs to improve bioavailability."},
+      {q:"What is polymorphism and why is it important in pharmaceutical formulations? Use an example.", a:"Polymorphism is the ability of a drug to exist in multiple crystal forms with different solubility, stability, and bioavailability. It is important because different polymorphs can have significantly different dissolution rates and bioavailability. Example: The appearance of a new polymorph (Form II) of Ritonavir caused catastrophic bioavailability failure and product withdrawal. Polymorphs are characterized using XRPD (X-ray powder diffraction) and DSC (differential scanning calorimetry)."},
+      {q:"State the Noyes-Whitney equation and explain how particle size affects dissolution rate and bioavailability.", a:"The Noyes-Whitney equation is: dm/dt = K1·A·(Cs - C)/h, where A is surface area, Cs is saturation solubility, C is bulk concentration, and h is diffusion layer thickness. Smaller particle size increases surface area (A), which increases dissolution rate. This is critical for BCS Class II/IV drugs where dissolution is rate-limiting. Microionisation of griseofulvin and spironolactone drastically improved absorption."},
+      {q:"What is bulk density and tapped density? How are Carr's Index and Hausner Ratio calculated and interpreted?", a:"Bulk density (ρB) is the mass of powder per unit volume including interparticle air spaces. Tapped density (ρT) is bulk density after mechanical tapping. Carr's Index = [(ρT - ρB)/ρT] × 100%. Hausner Ratio = ρT/ρB. Carr's Index <10% (Hausner 1.00–1.11) = excellent flow; 11–15% (1.12–1.18) = good; 16–20% (1.19–1.25) = fair; 21–25% (1.26–1.34) = passable; 26–31% (1.35–1.45) = poor; >32% (>1.46) = very poor flow."},
+      {q:"What factors affect powder flowability and how can poor flow be improved?", a:"Factors affecting flow: particle size (very fine <100 μm → cohesive → poor flow), particle shape (spherical best, irregular/needle increase friction), surface texture (rough surfaces increase friction), moisture content (water bridges increase cohesion), and electrostatics (static charge causes adhesion). Solutions: granulation (wet or dry) increases particle size and bulk density; glidants (colloidal SiO2, talc) reduce friction; spray drying produces smooth, spherical particles."},
+      {q:"Define wettability and contact angle. What does Young's equation describe?", a:"Wettability is the ability of a liquid to spread over and penetrate a powder surface. Contact angle (θ) is the angle between a liquid droplet and the solid surface. Hydrophilic surfaces have θ < 90° (good wetting); hydrophobic surfaces have θ > 90° (poor wetting). Young's equation: γSV = γSL + γLV·cosθ, where γSV is solid-vapour interfacial tension, γSL is solid-liquid, and γLV is liquid surface tension. Lower θ indicates better wetting."},
+      {q:"What strategies can be used to improve wettability of hydrophobic drugs?", a:"Strategies include: (1) Surfactants (SLS, polysorbate 80) — reduce contact angle; (2) Hydrophilic excipients (PVP, HPMC) in solid dispersions; (3) Particle engineering — hydrophilic polymer coating; (4) Salt formation — convert to more wettable salt form."},
+      {q:"What is the Biopharmaceutics Classification System (BCS) and how does it relate to physical property optimization?", a:"The BCS classifies drugs by solubility and permeability into four classes: Class I (high solubility, high permeability), Class II (low solubility, high permeability), Class III (high solubility, low permeability), and Class IV (low solubility, low permeability). Physical property optimization is most critical for Class II and IV drugs, where dissolution is the rate-limiting step for absorption."},
+    ]
+  },
+  // ========= SECTION 4: HYDROLYSIS & OXIDATION =========
+  {
+    id:'hydrolysis-oxidation',
+    color:'#FF6B52',
+    num:'04',
+    title:'Hydrolysis & Oxidative Degradation',
+    desc:'Hydrolytic degradation (mechanisms, catalysis, prevention), oxidative degradation (autoxidation, mechanisms, prevention), factors affecting reactions, and prevention strategies for liquid and solid dosage forms.',
+    short:[
+      {q:"Define pharmaceutical degradation and list the major types of chemical degradation.", a:"Pharmaceutical degradation is a deleterious change in chemical structure, physical properties, or physiological activity of a pharmaceutical product on exposure to unfavorable conditions. Major types include: hydrolytic degradation, thermal degradation, oxidative degradation, photolytic degradation, enzymatic decomposition, and polymerization."},
+      {q:"Why is hydrolysis the most common degradation pathway for pharmaceuticals? Which functional groups are most susceptible?", a:"Hydrolysis is common because many drugs contain hydrolytically susceptible functional groups and water is ubiquitous in formulations. Carbonyl bonds (C=O) are most susceptible. Among carbonyl bonds, anhydrides display the highest hydrolysis rate, followed by esters and carbonates."},
+      {q:"Distinguish between specific acid/base catalysis and general acid/base catalysis in hydrolysis.", a:"Specific acid/base catalysis depends only on the pH of the solution (hydronium or hydroxide ion concentration), not on the total amount of acid/base present. General acid/base catalysis depends on the total concentration of acids/bases present, including buffers. They can be distinguished by measuring reaction rates at the same pH but with different buffer concentrations — if the rate changes with buffer concentration, it's general catalysis."},
+      {q:"What is nucleophilic catalysis in hydrolysis? Give an example.", a:"Nucleophilic catalysis occurs when a nucleophile adds to a carbonyl to form an intermediate that is more susceptible to hydrolysis than the original species. A well-studied example is the imidazole-catalyzed hydrolysis of esters and amides with activated acyl groups. It is more common in phosphate hydrolysis, especially in DNA hydrolysis."},
+      {q:"How do metal ions catalyze hydrolysis reactions? Which metals are most effective?", a:"Divalent metal ions (Cu2+, Ni2+, Co2+, Zn2+, Ca2+, Mg2+, Mn2+, Cd2+) are most effective. Catalysis is often most effective when the molecule can chelate the metal such that the metal ion is held near the reacting site. Chelation can occur when a molecule has negative charges or dipoles arranged to ionically bind the metal ion."},
+      {q:"Why does hydrolysis in crystalline solids occur primarily in amorphous regions and crystal defects?", a:"Hydrolysis in crystalline domains is hindered by three factors: (1) Crystal packing stabilization adds reorganization energy to the activation energy; (2) Limited mobility raises activation energy for bimolecular processes; (3) Water in the crystal lattice tends to be bound as hydrates rather than available for reaction. Amorphous regions and defects preferentially adsorb water, plasticize the solid, and increase molecular mobility, facilitating hydrolysis."},
+      {q:"What are the formulation strategies to prevent hydrolytic degradation in liquid dosage forms?", a:"Strategies include: (1) pH optimization — using pH-rate profile to select pH of maximum stability; (2) Buffer selection — using appropriate buffers at pH of maximum stability; (3) Suspension formulations — reducing drug solubility to minimize degradation (e.g., procaine penicillin G suspension); (4) Non-aqueous solutions — replacing water with organic solvents; (5) Surfactants — micellar solubilization to protect from catalytic acid/base; (6) Lyophilization — removing water to reduce mobility."},
+      {q:"What are the formulation strategies to prevent hydrolytic degradation in solid dosage forms?", a:"Strategies include: (1) Excipient choice — using more brittle excipients with less water; (2) Acidity control — using buffers to maintain optimal micro-environmental pH; (3) Drug form selection — using crystalline forms with stronger lattice energies; (4) Processing condition control — reducing stress to minimize amorphous content; (5) Packaging — using moisture barriers (foil-foil blisters) and desiccants (silica gel, molecular sieves)."},
+      {q:"Describe the mechanism of autoxidation and the three stages involved.", a:"Autoxidation is a free radical chain reaction. Stages: (1) Initiation — free radicals generated by homolytic cleavage via photolytic, chemical, or thermal processes; (2) Propagation — formed free radical reacts with oxygen to produce a peroxy free radical, which reacts with another drug molecule, generating a new radical; (3) Termination — chain continues until free radical is eliminated when two radicals combine or a radical reacts with an antioxidant."},
+      {q:"What functional groups are susceptible to oxidation and what drugs undergo oxidation?", a:"Functional groups susceptible: amines (→ N-oxides, hydroxylamine), sulfides (→ sulfones, sulfoxides), phenols, aldehydes, unsaturated compounds, phenothiazines, and polyenes. Drugs that undergo oxidation: Vitamin A, Diclofenac, Hydrocortisone, Methyldopa."},
+      {q:"How can oxidative degradation be prevented in drug formulations?", a:"Prevention strategies: (1) Use of antioxidants (0.02–1% ascorbic acid) or chelating agents (0.01–0.075% sodium edetate) to prevent discoloration; (2) Use of tight stopper material to prevent oxygen exposure; (3) Increasing solubility of co-solvents (e.g., polyethylene glycol); (4) Design based on preformulation studies; (5) Control metal contamination by adding chelating agents or reducing metal contact during processing; (6) Reduce peroxide contamination by selecting alternative excipients or reducing suspect excipient concentration."},
+    ]
+  },
+  // ========= SECTION 5: RACEMIZATION & PHOTODEGRADATION =========
+  {
+    id:'racemization-photo',
+    color:'#9B87F5',
+    num:'05',
+    title:'Racemization & Photodegradation',
+    desc:'Racemization (chiral molecules, thalidomide, examples), photodegradation (photolabile drugs, mechanisms, prevention, packaging requirements), and photostability testing.',
+    short:[
+      {q:"Define racemization and explain its pharmaceutical significance.", a:"Racemization is the conversion of an optically active compound to its optically inactive form (racemic mixture) by heat, chemical reaction, or autoracemization. Pharmaceutical significance: enantiomers may have different pharmacological activities, toxicities, and pharmacokinetic profiles. The wrong enantiomer may be inactive or even harmful (e.g., thalidomide)."},
+      {q:"What is the difference between enantiomers, diastereomers, and racemic mixtures?", a:"Enantiomers are non-superposable mirror images of a chiral molecule. They have identical physical properties (except optical rotation) but may differ in chemical properties when reacting with other chiral compounds. Diastereomers are stereoisomers that are not mirror images. A racemic mixture is an equal mixture of two enantiomers, which is optically inactive and may have different chemical and physical properties from the pure enantiomers."},
+      {q:"Discuss the thalidomide tragedy in the context of enantiomer pharmacology. Which enantiomer was teratogenic?", a:"Thalidomide was sold as a (S,R)-racemic mixture as a sedative. The (S)-isomer was teratogenic (causing birth defects), while the (R)-enantiomer acts as a sedative. The tragedy was compounded by the fact that interconversion between the (S)- and (R)-forms occurs quickly in aqueous media. Later studies identified cereblon (CRBN) as the thalidomide-binding protein, and the (S)-enantiomer displayed 10-fold stronger binding to CRBN compared to the (R)-isomer."},
+      {q:"Give examples of drugs where one enantiomer is preferred and explain why.", a:"S-Clopidogrel: (S)-enantiomer is active as an anti-platelet pro-drug; (R)-enantiomer is inactive and at high doses can cause convulsions. Levobupivacaine: (S)-enantiomer is less cardiotoxic than racemic bupivacaine. Levocetirizine: the active enantiomer of cetirizine has 2-fold higher affinity for H1-receptors than the racemate. (S)-Amlodipine: only the (S)-enantiomer possesses therapeutic activity as a calcium channel blocker."},
+      {q:"What is photodegradation and what are photolabile drugs?", a:"Photodegradation is degradation induced by exposure to light (especially UV light) which has higher energy. When certain compounds absorb this energy, chemical reactions may initiate leading to degradation. Photolabile drugs are drugs that undergo light-induced degradation (e.g., nifedipine, nicardipine, nitroprusside, chlorthalidone, acetazolamide, retinol, riboflavin, furosemide, phenothiazines)."},
+      {q:"What functional groups are important for photoreactivity?", a:"Functional groups that enable photochemical reactions: double bonds (C=C) — oxidation/isomerization; carbonyl groups (C=O) — reduction/fragmentation; aryl chlorides — dechlorination; nitroaromatic groups — hydrogen abstraction; weak C-H bonds — photoinduced fragmentation; sulfides, alkenes, polyenes, and phenols — highly reactive with singlet oxygen."},
+      {q:"What are the objectives of photostability testing?", a:"Objectives include: determine intrinsic photostability characteristics; identify physical and chemical changes upon light exposure; elucidate photodegradation pathways and mechanisms; determine shelf life; evaluate efficacy of photostabilizing agents; assess need for formulation modification; identify measures to overcome light effects during manufacturing, packaging, transportation, and storage; evaluate light-induced biological effects; design primary and secondary packaging."},
+      {q:"How can pharmaceutical products be protected from photodegradation?", a:"Protection methods include: (1) Using opaque or amber-colored containers (amber glass transmits light above 470 nm, suitable for drugs absorbing in UV region); (2) Opaque secondary packaging; (3) Use of opacifying and coating agents; (4) Complex formation; (5) Liposome formation; (6) Choice of solvents; (7) Use of stabilisers; (8) Choice of pH; (9) Spectra overlay."},
+      {q:"Describe the difference between photochemical oxidation and other photodegradation pathways.", a:"Photodegradation mostly involves oxidation mechanisms, but other pathways like polymerization or ring opening may also occur. Photochemical oxidation involves the generation of reactive oxygen species (singlet oxygen) upon light absorption, which then oxidize the drug molecule. Unlike thermal oxidation, photodegradation can occur at any stage from manufacturing to consumption when exposed to light."},
+    ]
+  },
+  // ========= SECTION 6: PHYSICAL STABILITY & KINETICS =========
+  {
+    id:'physical-stability-kinetics',
+    color:'#FF8C42',
+    num:'06',
+    title:'Physical Stability & Kinetics in Stability Testing',
+    desc:'Physical stability problems in dosage forms, factors affecting physical stability (temperature, moisture, light, pH, excipients, vibration), accelerated stability studies, shelf-life determination, zero-order, first-order, and second-order kinetics.',
+    short:[
+      {q:"Define physical stability and list the physical properties that should be maintained.", a:"Physical stability is the ability of a pharmaceutical product to retain its original physical properties, appearance, palatability, uniformity, dissolution characteristics, and performance throughout its shelf life. A physically stable product should maintain: colour, odour, taste, texture, uniformity, viscosity, particle size, dissolution rate, and drug release characteristics."},
+      {q:"What are the major factors affecting physical stability and how can they be controlled?", a:"Factors: (1) Temperature — control via appropriate storage conditions and temperature-resistant packaging; (2) Moisture — use moisture-proof containers, desiccants, and controlled storage environments; (3) Light exposure — use amber containers and opaque packaging; (4) pH — use buffer systems and careful pH adjustment; (5) Nature of excipients — conduct compatibility studies and rational excipient selection; (6) Vibration and mechanical stress — use protective packaging and proper transportation conditions."},
+      {q:"What physical stability problems occur in different dosage forms?", a:"Tablets: softening, chipping, breakage, discoloration. Capsules: shell brittleness or softening. Suspensions: sedimentation, caking, crystal growth. Emulsions: creaming, phase separation, cracking. Ointments: melting, phase separation, drying out. Suppositories: melting, softening, crystal growth."},
+      {q:"What is shelf life and how is it determined?", a:"Shelf life is the time span over which the quality of a product remains within specifications — the time period over which efficacy, safety, and esthetics can be assured. It is determined by stability studies where a quality-indicating parameter is monitored over time. When degradation can be described by a rate expression, shelf life can be estimated using kinetic principles (zero-order, first-order, or second-order kinetics)."},
+      {q:"What are accelerated storage tests and why are they performed?", a:"Accelerated storage tests are stability studies conducted at elevated temperature and humidity conditions to predict shelf life under normal storage conditions. They include: preformulation assessment, prediction of shelf life by stress testing, temperature cycling, and photostability testing. Products undergoing long-term stability testing must be stored in the exact packaging that will be used when the product is marketed."},
+      {q:"State the integrated rate equations for zero-order, first-order, and second-order reactions.", a:"Zero-order: C = C0 - Kt (plot of C vs t is linear, slope = -K). First-order: ln C = ln C0 - Kt or log C = log C0 - Kt/2.303 (plot of ln C vs t is linear, slope = -K). Second-order: 1/C = 1/C0 + Kt (plot of 1/C vs t is linear, slope = K)."},
+      {q:"Explain how kinetic principles are applied in stability testing.", a:"Kinetic studies provide information on the mechanism of degradation and allow prediction of the degree of change that will occur after a given time. By determining the order of reaction (zero, first, or second order), the rate constant (K) can be calculated. This enables estimation of shelf life (t90 or t10%) and prediction of drug concentration at any time point. Temperature effects on reaction rates follow the Arrhenius equation."},
+      {q:"What is the effect of temperature on reaction rates and how is it applied in stability studies?", a:"Increasing temperature increases the rate of reaction — a 10°C increase in temperature approximately doubles the rate constant (van't Hoff rule). This principle is used in accelerated stability studies where products are stored at elevated temperatures (e.g., 40°C, 50°C) to predict degradation at room temperature using the Arrhenius equation."},
+      {q:"Describe the testing protocols for stability studies regarding packaging.", a:"Products undergoing long-term stability testing must be stored in the exact packaging that will be used when the product is marketed. Liquid products packaged in containers must be stored inverted to allow any interaction with the closure to be detected. This ensures that the stability data reflects real-world conditions and that any packaging-related stability issues are identified."},
+      {q:"A formulation scientist observes that a crystalline drug becomes increasingly unstable after milling. Explain the physicochemical basis for this observation.", a:"Milling introduces stress that can create amorphous regions or crystal defects. Amorphous regions have higher free energy, are more susceptible to hydrolysis, and can adsorb more water. The increased surface area from milling also increases exposure to moisture and oxygen. Additionally, milling can cause polymorphic conversion to less stable forms. These changes collectively increase degradation rates."},
+      {q:"A pharmacist notices a vinegar-like odour in a stored aspirin tablet formulation. Explain the degradation pathway and identify the degradation products.", a:"Aspirin undergoes hydrolytic degradation (de-esterification) in the presence of moisture. The ester bond in aspirin is cleaved by water, producing salicylic acid and acetic acid. The vinegar-like odour is due to acetic acid. This degradation is accelerated by moisture and heat, and the salicylic acid formed can further oxidize, causing discoloration."},
+      {q:"Compare hydrolytic degradation and oxidative degradation with respect to mechanism, factors affecting the reactions, and methods of prevention.", a:"Hydrolysis: mechanism involves nucleophilic attack of water on susceptible bonds (especially carbonyls); factors include pH, temperature, moisture, and catalysis by acids, bases, metals, or buffers; prevention includes pH optimization, non-aqueous solvents, lyophilization, and moisture-proof packaging. Oxidation: mechanism involves electron transfer or free radical chain reactions (autoxidation); factors include light, heat, metals, and presence of oxygen; prevention includes antioxidants, chelating agents, oxygen-impermeable packaging, and inert gas purging."},
+    ]
+  }
+];
+
+/* ============================================================
+   ICONS
+   ============================================================ */
+const ICO = {
+  prev:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>',
+  next:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>',
+  flip:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><polyline points="21 3 21 9 15 9"/></svg>',
+  card:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="15" height="11" rx="2"/><path d="M7 3h11a2 2 0 0 1 2 2v11"/></svg>',
+  list:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l2 2 4-4"/><path d="M9 14l2 2 4-4"/><line x1="17" y1="7" x2="21" y2="7"/><line x1="17" y1="15" x2="21" y2="15"/></svg>',
+};
+
+/* ============================================================
+   STATE + PERSISTENCE
+   ============================================================ */
+const STORAGE_KEY = "pct423_flashcards_v1";
+
+let storageAvailable = true;
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){ storageAvailable = false; }
+  return { name:null, progress:{} };
+}
+function saveState(){
+  if(!storageAvailable) return;
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+  catch(e){ storageAvailable = false; }
+}
+
+let state = loadState();
+let route = state.name ? {screen:'home'} : {screen:'gate'};
+let activeQuiz = null;
+let cardFlipLocal = false;
+
+function ensureProgress(sectionId){
+  const section = SECTIONS.find(s=>s.id===sectionId);
+  if(!state.progress[sectionId]) state.progress[sectionId] = {};
+  const p = state.progress[sectionId];
+  if(!p.short || !Array.isArray(p.short.revealed) || p.short.revealed.length !== section.short.length){
+    p.short = {idx:0, revealed:new Array(section.short.length).fill(false), status:'new'};
+  }
+  return p;
+}
+
+/* ============================================================
+   RENDER ENGINE
+   ============================================================ */
+const app = document.getElementById('app');
+
+function render(){
+  try{
+    app.innerHTML = '';
+    if(route.screen === 'gate') return renderGate();
+    renderTopbar();
+    if(route.screen === 'home') return renderHome();
+    if(route.screen === 'quiz') return renderQuiz();
+    if(route.screen === 'results') return renderResults();
+  }catch(err){
+    console.error('Render error:', err);
+    app.innerHTML = `<div class="wrap" style="padding-top:60px;text-align:center;">
+      <p style="color:var(--text-1);font-size:0.85rem;">Something went wrong loading this screen.</p>
+      <button class="btn btn-primary btn-sm" style="margin-top:14px;" onclick="route={screen:'gate'};render();">Go back</button>
+    </div>`;
+  }
+}
+
+function renderTopbar(){
+  const bar = document.createElement('div');
+  bar.className = 'topbar wrap';
+  bar.innerHTML = `
+    <div class="brand">
+      <span class="brand-mono">PCT 423/521</span>
+      <span class="brand-word">Stability<span class="dot">.</span></span>
+    </div>
+    <div class="user-chip"><span class="dot-ico"></span> <strong>${escapeHtml(state.name)}</strong></div>
+  `;
+  app.appendChild(bar);
+}
+
+function renderGate(){
+  const el = document.createElement('div');
+  el.className = 'gate';
+  el.innerHTML = `
+    <div class="gate-eyebrow">PCT 423/521 · Stability, Packaging & Physical Pharmacy</div>
+    <h1>Master <em>theory</em><br/>& <em>application</em>.</h1>
+    <p class="lead">Polymorphism · Modified release · Packaging · Physical properties · Hydrolysis · Oxidation · Racemization · Photodegradation · Physical stability · Kinetics — fully covered.</p>
+    <form class="name-form" id="nameForm" autocomplete="off">
+      <input type="text" id="nameInput" placeholder="Enter your name to begin" required maxlength="40"/>
+      <button type="submit" class="btn btn-primary">Start studying →</button>
+    </form>
+    <p class="gate-hint">Your progress saves automatically on this device — close the tab any time.</p>
+  `;
+  app.appendChild(el);
+  const form = document.getElementById('nameForm');
+  form.addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const val = document.getElementById('nameInput').value.trim();
+    if(!val) return;
+    state.name = val;
+    saveState();
+    route = {screen:'home'};
+    render();
+  });
+  document.getElementById('nameInput').focus();
+}
+
+function renderHome(){
+  const wrap = document.createElement('div');
+  wrap.className = 'wrap';
+
+  let totalDone=0, totalItems=0;
+  SECTIONS.forEach(s=>{
+    const p = ensureProgress(s.id);
+    totalItems += s.short.length;
+    totalDone += p.short.revealed.filter(Boolean).length;
+  });
+  const pct = totalItems ? Math.round((totalDone/totalItems)*100) : 0;
+
+  wrap.innerHTML = `
+    <div class="home-head">
+      <div class="eyebrow">Welcome back, ${escapeHtml(state.name.split(' ')[0])}</div>
+      <h1>Choose a topic to study</h1>
+      <p>Each section contains standard theory questions and application questions covering all lecture content.</p>
+      <div class="overall-bar"><div class="overall-bar-fill" style="width:${pct}%"></div></div>
+      <div class="overall-label">${pct}% OF ALL CARDS REVIEWED · ${totalDone}/${totalItems}</div>
+    </div>
+    <div class="topic-list" id="topicList"></div>
+  `;
+  app.appendChild(wrap);
+
+  const list = document.getElementById('topicList');
+  SECTIONS.forEach((s, si)=>{
+    const p = ensureProgress(s.id);
+    const card = document.createElement('div');
+    card.className = 'topic-card';
+    card.style.setProperty('--tcolor', s.color);
+    card.style.animationDelay = (si*0.06)+'s';
+    const done = p.short.revealed.filter(Boolean).length;
+    const total = s.short.length;
+    const badge = p.short.status==='done' ? `<span class="mode-badge badge-done">Done</span>`
+          : done>0 ? `<span class="mode-badge badge-progress">Resume</span>`
+          : `<span class="mode-badge badge-new">Start</span>`;
+    card.innerHTML = `
+      <div class="topic-top">
+        <div>
+          <div class="topic-num">SECTION ${s.num}</div>
+          <div class="topic-title">${s.title}</div>
+          <div class="topic-desc">${s.desc}</div>
+        </div>
+      </div>
+      <div class="mode-row">
+        <button class="mode-btn" data-section="${s.id}">
+          <span class="mtop"><span class="mlabel">${ICO.card} Theory Questions</span>${badge}</span>
+          <span class="mprog">${done}/${total} reviewed</span>
+        </button>
+      </div>
+    `;
+    list.appendChild(card);
+  });
+
+  list.querySelectorAll('.mode-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      startOrResume(btn.dataset.section);
+    });
+  });
+}
+
+function startOrResume(sectionId){
+  const p = ensureProgress(sectionId);
+  const section = SECTIONS.find(s=>s.id===sectionId);
+  const m = p.short;
+  if(m.status === 'done'){
+    m.idx = 0; m.status = 'new';
+    m.revealed = new Array(section.short.length).fill(false);
+    saveState();
+  }
+  activeQuiz = {sectionId, idx:m.idx||0};
+  route = {screen:'quiz'};
+  render();
+}
+
+function renderQuiz(){
+  const section = SECTIONS.find(s=>s.id===activeQuiz.sectionId);
+  const items = section.short;
+
+  const wrap = document.createElement('div');
+  wrap.className = 'wrap';
+  wrap.style.setProperty('--accent', section.color);
+
+  wrap.innerHTML = `
+    <div class="back-row"><button class="btn btn-ghost btn-sm" id="backHome">← All topics</button></div>
+    <div class="quiz-topbar">
+      <div class="quiz-meta">${section.title} · Theory Questions</div>
+      <div class="quiz-counter mono" id="cardCounter"></div>
+    </div>
+    <div class="dot-row" id="dotRow"></div>
+    <div class="qcard-outer"><div class="qcard" id="qcard"></div></div>
+    <div class="quiz-nav">
+      <button class="nav-btn nav-prev" id="prevBtn">${ICO.prev}<span class="nb-label">Prev</span></button>
+      <button class="nav-btn nav-next" id="nextBtn"><span class="nb-label" id="nextLabel">Next</span>${ICO.next}</button>
+    </div>
+  `;
+  app.appendChild(wrap);
+
+  document.getElementById('backHome').addEventListener('click', ()=>{ route={screen:'home'}; render(); });
+  document.getElementById('prevBtn').addEventListener('click', goPrev);
+  document.getElementById('nextBtn').addEventListener('click', goNext);
+
+  renderCardContent(activeQuiz.idx, 'none');
+}
+
+function renderCardContent(idx, direction){
+  const section = SECTIONS.find(s=>s.id===activeQuiz.sectionId);
+  const items = section.short;
+  const item = items[idx];
+  const qcard = document.getElementById('qcard');
+
+  const build = ()=>{
+    qcard.innerHTML = shortCardHtml(item);
+    attachShortHandlers(section, idx);
+    updateCounter(idx, items.length);
+    updateDots(idx);
+    updateNavState(section, idx, items.length);
+  };
+
+  if(direction === 'none'){
+    build();
+    return;
+  }
+
+  const exitClass = direction === 'next' ? 'card-exit-left' : 'card-exit-right';
+  const enterClass = direction === 'next' ? 'card-enter-right' : 'card-enter-left';
+  qcard.classList.add(exitClass);
+  setTimeout(()=>{
+    qcard.classList.remove(exitClass);
+    qcard.classList.add(enterClass);
+    build();
+    requestAnimationFrame(()=>{
+      requestAnimationFrame(()=>{
+        qcard.classList.remove(enterClass);
+      });
+    });
+  }, 190);
+}
+
+function shortCardHtml(item){
+  return `
+    <div class="qkicker">Theory Question</div>
+    <div class="flip-scene" id="flipScene">
+      <div class="flip-card" id="flipCard">
+        <div class="flip-face front">
+          <div class="qtext">${escapeHtml(item.q)}</div>
+          <div class="flip-hint">${ICO.flip}</div>
+        </div>
+        <div class="flip-face back">
+          <div class="flip-answer-text">${escapeHtml(item.a)}</div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function attachShortHandlers(section, idx){
+  cardFlipLocal = false;
+  const scene = document.getElementById('flipScene');
+  const cardEl = document.getElementById('flipCard');
+  scene.addEventListener('click', ()=>{
+    cardFlipLocal = !cardFlipLocal;
+    cardEl.classList.toggle('flipped', cardFlipLocal);
+    if(cardFlipLocal){
+      const p = ensureProgress(section.id).short;
+      if(!p.revealed[idx]){
+        p.revealed[idx] = true;
+        if(p.status === 'new') p.status = 'progress';
+        saveState();
+        updateDots(idx);
+      }
+    }
+  });
+}
+
+function updateCounter(idx, total){
+  const el = document.getElementById('cardCounter');
+  if(el) el.textContent = `${idx+1} / ${total}`;
+}
+
+function buildDotsHtml(section, mode, idx){
+  const items = section[mode];
+  const p = ensureProgress(section.id)[mode];
+  return items.map((_,i)=>{
+    const filled = p.revealed[i];
+    let cls = 'pip' + (filled?' filled':'') + (i===idx?' current':'');
+    return `<span class="${cls}"></span>`;
+  }).join('');
+}
+function updateDots(idx){
+  const section = SECTIONS.find(s=>s.id===activeQuiz.sectionId);
+  const el = document.getElementById('dotRow');
+  if(el) el.innerHTML = buildDotsHtml(section, 'short', idx);
+}
+
+function updateNavState(section, idx, total){
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const nextLabel = document.getElementById('nextLabel');
+  if(!prevBtn || !nextBtn) return;
+  prevBtn.disabled = idx === 0;
+  const isLast = idx === total-1;
+  nextBtn.disabled = false;
+  nextLabel.textContent = isLast ? 'Finish' : 'Next';
+}
+
+function goNext(){
+  const section = SECTIONS.find(s=>s.id===activeQuiz.sectionId);
+  const items = section.short;
+  const idx = activeQuiz.idx;
+  const isLast = idx === items.length-1;
+  const p = ensureProgress(section.id).short;
+
+  if(isLast){
+    p.status = 'done';
+    saveState();
+    route = {screen:'results'};
+    render();
+    return;
+  }
+  activeQuiz.idx += 1;
+  p.idx = activeQuiz.idx;
+  if(p.status === 'new') p.status = 'progress';
+  saveState();
+  renderCardContent(activeQuiz.idx, 'next');
+}
+
+function goPrev(){
+  if(activeQuiz.idx === 0) return;
+  activeQuiz.idx -= 1;
+  const section = SECTIONS.find(s=>s.id===activeQuiz.sectionId);
+  const p = ensureProgress(section.id).short;
+  p.idx = activeQuiz.idx;
+  saveState();
+  renderCardContent(activeQuiz.idx, 'prev');
+}
+
+document.addEventListener('keydown', (e)=>{
+  if(!route || route.screen !== 'quiz') return;
+  if(e.key === 'ArrowRight'){
+    const nb = document.getElementById('nextBtn');
+    if(nb && !nb.disabled) goNext();
+  } else if(e.key === 'ArrowLeft'){
+    const pb = document.getElementById('prevBtn');
+    if(pb && !pb.disabled) goPrev();
+  } else if((e.key === ' ' || e.key === 'Enter') && activeQuiz){
+    const scene = document.getElementById('flipScene');
+    if(scene){ e.preventDefault(); scene.click(); }
+  }
+});
+
+function renderResults(){
+  const section = SECTIONS.find(s=>s.id===activeQuiz.sectionId);
+  const items = section.short;
+  const p = ensureProgress(section.id).short;
+
+  const reviewed = p.revealed.filter(Boolean).length;
+  const pct = Math.round((reviewed/items.length)*100);
+  const sub = `${reviewed} of ${items.length} cards reviewed`;
+  const verdict = pct>=80 ? 'Excellent work' : pct>=50 ? 'Good progress' : 'Keep practicing';
+
+  const wrap = document.createElement('div');
+  wrap.className = 'wrap';
+  wrap.innerHTML = `
+    <div class="results-card">
+      <div class="results-eyebrow">${section.title} · Theory Questions complete</div>
+      <div class="score-ring-wrap" id="scoreRing">
+        <div class="score-ring-inner">
+          <div class="score-pct" id="scorePct">0%</div>
+          <div class="score-pct-label">Reviewed</div>
+        </div>
+      </div>
+      <div class="results-verdict">${verdict}</div>
+      <div class="results-sub">${sub}</div>
+      <div class="results-actions">
+        <button class="btn btn-primary btn-sm" id="retryBtn">Study again</button>
+        <button class="btn btn-ghost btn-sm" id="homeBtn">Back to all topics</button>
+      </div>
+    </div>
+  `;
+  app.appendChild(wrap);
+
+  animateScoreRing(document.getElementById('scoreRing'), document.getElementById('scorePct'), pct);
+
+  document.getElementById('retryBtn').addEventListener('click', ()=>{
+    startOrResume(activeQuiz.sectionId);
+  });
+  document.getElementById('homeBtn').addEventListener('click', ()=>{
+    route = {screen:'home'};
+    render();
+  });
+}
+
+function animateScoreRing(ringEl, textEl, pctFinal){
+  if(!ringEl || !textEl) return;
+  const dur = 900;
+  let start = null;
+  function step(ts){
+    if(!start) start = ts;
+    const t = Math.min((ts-start)/dur, 1);
+    const eased = 1 - Math.pow(1-t, 3);
+    const val = Math.round(eased*pctFinal);
+    ringEl.style.background = `conic-gradient(var(--gold-dim) ${val}%, rgba(11,18,32,0.08) 0)`;
+    textEl.textContent = val + '%';
+    if(t < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+function escapeHtml(str){
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+render();
+</script>
+</body>
+</html>
