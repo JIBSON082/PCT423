@@ -211,7 +211,7 @@
   .qcard-outer{perspective:2200px;}
   .qcard{
     background:var(--paper); color:var(--ink); border-radius:20px; padding:38px 34px;
-    min-height:300px; display:flex; flex-direction:column; position:relative;
+    min-height:350px; display:flex; flex-direction:column; position:relative;
     box-shadow:0 24px 60px -22px rgba(0,0,0,0.6);
     transition:transform .32s cubic-bezier(.22,.61,.36,1), opacity .32s cubic-bezier(.22,.61,.36,1);
   }
@@ -227,18 +227,45 @@
   .qkicker{font-family:'JetBrains Mono',monospace; font-size:0.68rem; text-transform:uppercase; letter-spacing:0.14em; color:var(--cyan-dim); font-weight:600; margin-bottom:16px;}
   .qtext{font-family:'Fraunces',serif; font-size:1.4rem; line-height:1.42; font-weight:500; flex:1;}
 
-  .flip-scene{perspective:1800px; margin-top:4px; flex:1; display:flex; cursor:pointer; min-height:190px;}
+  .flip-scene{perspective:1800px; margin-top:4px; flex:1; display:flex; cursor:pointer; min-height:220px;}
   .flip-card{
     width:100%; position:relative; transform-style:preserve-3d;
-    transition:transform .6s cubic-bezier(.34,1.15,.34,1); min-height:190px;
+    transition:transform .6s cubic-bezier(.34,1.15,.34,1); min-height:220px;
   }
   .flip-card.flipped{transform:rotateY(180deg);}
   .flip-face{
     position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden;
     display:flex; flex-direction:column; justify-content:center;
+    min-height:220px;
   }
-  .flip-face.back{transform:rotateY(180deg);}
-  .flip-answer-text{font-family:'Fraunces',serif; font-size:1.12rem; line-height:1.62; color:#2b3745; font-weight:400;}
+  .flip-face.back{
+    transform:rotateY(180deg);
+    overflow-y:auto;
+    max-height:320px;
+    padding:4px 0;
+  }
+  .flip-answer-text{
+    font-family:'Fraunces',serif;
+    font-size:1.12rem;
+    line-height:1.62;
+    color:#2b3745;
+    font-weight:400;
+    max-height:280px;
+    overflow-y:auto;
+    padding-right:6px;
+    scrollbar-width:thin;
+  }
+  .flip-answer-text::-webkit-scrollbar{
+    width:5px;
+  }
+  .flip-answer-text::-webkit-scrollbar-track{
+    background:rgba(11,18,32,0.05);
+    border-radius:10px;
+  }
+  .flip-answer-text::-webkit-scrollbar-thumb{
+    background:var(--gold-dim);
+    border-radius:10px;
+  }
   .flip-hint{
     position:absolute; bottom:0; right:2px; color:var(--ink-soft); opacity:0.32;
     animation:floatPulse 2.6s ease-in-out infinite;
@@ -281,11 +308,13 @@
 
   @media (max-width:600px){
     .gate h1{font-size:2.05rem;}
-    .qcard{padding:28px 22px;}
+    .qcard{padding:28px 22px; min-height:300px;}
     .topic-card{padding:19px;}
     .mode-row{flex-direction:column;}
     .nav-btn{padding:13px 16px; flex:1;}
     .nav-btn span.nb-label{display:inline;}
+    .flip-face.back{max-height:260px;}
+    .flip-answer-text{max-height:220px; font-size:1rem;}
   }
 
   @media (prefers-reduced-motion: reduce){
@@ -453,7 +482,7 @@ const ICO = {
 /* ============================================================
    STATE + PERSISTENCE
    ============================================================ */
-const STORAGE_KEY = "pct423_flashcards_v1";
+const STORAGE_KEY = "pct423_flashcards_v2";
 
 let storageAvailable = true;
 function loadState(){
